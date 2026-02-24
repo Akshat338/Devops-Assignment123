@@ -89,24 +89,21 @@ git branch -M main
 #### 2.2 Create GitHub Repository
 
 1. Go to https://github.com/new
-2. Repository name: `crud-dd-task-mean-app`
-3. **Important:** Do NOT initialize with README, .gitignore, or license
-4. Click "Create repository"
-5. Copy the repository URL
+2. **Note:** Repository is already created at: https://github.com/Akshat338/Devops-Assignment123.git
+3. You can proceed directly to pushing code
 
 #### 2.3 Push to GitHub
 
 ```bash
-# Replace with your GitHub URL
-git remote add origin https://github.com/<YOUR-USERNAME>/crud-dd-task-mean-app.git
+# Repository already exists
 git push -u origin main
 
-# Verify by checking GitHub repository online
+# Verify by checking GitHub
 # You should see all files including:
 # - backend/, frontend/, nginx/ directories
 # - .github/workflows/deploy.yml
 # - docker-compose.yml and docker-compose.prod.yml
-# - README.md and DEPLOYMENT_STEPS.md
+# - README.md and other documentation
 ```
 
 **Result:** Repository successfully created and code pushed to GitHub
@@ -138,18 +135,19 @@ git push -u origin main
 ```bash
 # Log in to Docker Hub
 docker login
-# Enter username and paste the access token
+# Username: akshat919
+# Password: [paste your actual Docker Hub token - do not commit tokens!]
 
 # Build backend image
-docker build -t <YOUR-DOCKER-USERNAME>/crud-dd-backend:latest ./backend
-docker push <YOUR-DOCKER-USERNAME>/crud-dd-backend:latest
+docker build -t akshat919/crud-dd-backend:latest ./backend
+docker push akshat919/crud-dd-backend:latest
 
 # Build frontend image  
-docker build -t <YOUR-DOCKER-USERNAME>/crud-dd-frontend:latest ./frontend
-docker push <YOUR-DOCKER-USERNAME>/crud-dd-frontend:latest
+docker build -t akshat919/crud-dd-frontend:latest ./frontend
+docker push akshat919/crud-dd-frontend:latest
 
 # Verify images on Docker Hub
-# Visit https://hub.docker.com/u/<YOUR-DOCKER-USERNAME>
+# Visit https://hub.docker.com/u/akshat919
 # You should see both repositories with "latest" tag
 ```
 
@@ -193,13 +191,13 @@ Get your instance's **Public IPv4 address** from the EC2 dashboard.
 **Using Windows Git Bash:**
 ```bash
 # Change key permissions
-chmod 600 /path/to/crud-app-key.pem
+chmod 600 Akshat.pem
 
 # Connect via SSH (replace IP with your instance IP)
-ssh -i /path/to/crud-app-key.pem ubuntu@YOUR_EC2_PUBLIC_IP
+ssh -i Akshat.pem ubuntu@YOUR_EC2_PUBLIC_IP
 
 # Example:
-# ssh -i C:/Users/disha/Downloads/crud-app-key.pem ubuntu@52.170.245.123
+# ssh -i Akshat.pem ubuntu@52.170.245.123
 ```
 
 #### 4.3 One-Click Automated Setup
@@ -209,14 +207,14 @@ Once connected to EC2, run:
 ```bash
 # Clone repository
 cd /tmp
-git clone https://github.com/<YOUR-USERNAME>/crud-dd-task-mean-app.git
-cd crud-dd-task-mean-app
+git clone https://github.com/Akshat338/Devops-Assignment123.git
+cd Devops-Assignment123
 
-# Run deployment script (with your Docker Hub username)
-bash deploy/deploy.sh <YOUR-DOCKER-USERNAME>
+# Run deployment script
+bash deploy/deploy.sh akshat919
 
 # Example:
-# bash deploy/deploy.sh myusername
+# bash deploy/deploy.sh akshat919
 ```
 
 **OR manually:**
@@ -234,10 +232,10 @@ newgrp docker
 
 # Clone and deploy
 mkdir -p /opt/crud-app && cd /opt/crud-app
-git clone https://github.com/<YOUR-USERNAME>/crud-dd-task-mean-app.git .
+git clone https://github.com/Akshat338/Devops-Assignment123.git .
 
 # Start application
-export DOCKERHUB_USERNAME=<YOUR-DOCKER-USERNAME>
+export DOCKERHUB_USERNAME=akshat919
 docker-compose -f docker-compose.prod.yml pull
 docker-compose -f docker-compose.prod.yml up -d
 
@@ -274,17 +272,17 @@ Add these 6 secrets:
 
 | Secret Name | Value | Where to Get |
 |---|---|---|
-| `DOCKERHUB_USERNAME` | Your Docker Hub username | Your Docker Hub account |
-| `DOCKERHUB_TOKEN` | Your access token | Docker Hub → Account Settings → Security → Personal access tokens |
+| `DOCKERHUB_USERNAME` | akshat919 | Your Docker Hub account |
+| `DOCKERHUB_TOKEN` | [Your Docker Hub token] | Docker Hub → Account Settings → Security → Personal access tokens |
 | `VM_HOST` | Your EC2 public IP | AWS Console → EC2 → Instances → Public IPv4 address |
 | `VM_USER` | `ubuntu` | (Fixed value) |
-| `VM_SSH_KEY` | Contents of .pem file | Read the entire crud-app-key.pem file contents |
+| `VM_SSH_KEY` | Contents of Akshat.pem file | Read the entire Akshat.pem file contents |
 | `VM_PORT` | `22` | (Fixed value) |
 
 **To get VM_SSH_KEY contents:**
-- On your local machine, open the .pem file with a text editor
+- On your local machine, open the Akshat.pem file with a text editor
 - Select ALL text (including BEGIN and END lines)
-- Copy and paste into the GitHub Secret
+- Copy and paste into the GitHub Secret (VM_SSH_KEY)
 - Make sure line breaks are preserved
 
 #### 5.2 Test CI/CD Pipeline

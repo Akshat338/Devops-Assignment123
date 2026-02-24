@@ -35,10 +35,8 @@ git add .
 git commit -m "Initial MEAN app with Docker, Nginx, and CI/CD"
 git branch -M main
 
-# Create repo at: https://github.com/new
-# Name: crud-dd-task-mean-app
-# Then run:
-git remote add origin https://github.com/<YOUR-USERNAME>/crud-dd-task-mean-app.git
+# Repository already exists at: https://github.com/Akshat338/Devops-Assignment123.git
+# Push code to existing repository:
 git push -u origin main
 ```
 
@@ -60,14 +58,14 @@ git push -u origin main
 ### 3C: Push Images
 ```bash
 docker login
-# Username: your-docker-hub-username
-# Password: [paste access token]
+# Username: akshat919
+# Password: [Your Docker Hub personal access token - Keep this secure!]
 
-docker build -t <USERNAME>/crud-dd-backend:latest ./backend
-docker push <USERNAME>/crud-dd-backend:latest
+docker build -t akshat919/crud-dd-backend:latest ./backend
+docker push akshat919/crud-dd-backend:latest
 
-docker build -t <USERNAME>/crud-dd-frontend:latest ./frontend
-docker push <USERNAME>/crud-dd-frontend:latest
+docker build -t akshat919/crud-dd-frontend:latest ./frontend
+docker push akshat919/crud-dd-frontend:latest
 ```
 
 ✅ **Verify:** Check https://hub.docker.com - both images should be there
@@ -93,15 +91,15 @@ docker push <USERNAME>/crud-dd-frontend:latest
 ### 4C: Connect & Deploy
 ```bash
 # Change key permissions
-chmod 600 /path/to/crud-app-key.pem
+chmod 600 Akshat.pem
 
-# SSH into EC2
-ssh -i /path/to/crud-app-key.pem ubuntu://YOUR_EC2_IP
+# SSH into EC2 (replace YOUR_EC2_IP with your EC2 public IP)
+ssh -i Akshat.pem ubuntu@YOUR_EC2_IP
 
 # Run automated deployment
 cd /tmp
-git clone https://github.com/<YOUR-USERNAME>/crud-dd-task-mean-app.git
-bash crud-dd-task-mean-app/deploy/deploy.sh <YOUR-DOCKER-USERNAME>
+git clone https://github.com/Akshat338/Devops-Assignment123.git
+bash Devops-Assignment123/deploy/deploy.sh akshat919
 ```
 
 ### 4D: Manual Alternative (if script fails)
@@ -111,9 +109,9 @@ sudo systemctl start docker
 sudo usermod -aG docker ubuntu
 
 mkdir -p /opt/crud-app && cd /opt/crud-app
-git clone https://github.com/<YOUR-USERNAME>/crud-dd-task-mean-app.git .
+git clone https://github.com/Akshat338/Devops-Assignment123.git .
 
-export DOCKERHUB_USERNAME=<YOUR-USERNAME>
+export DOCKERHUB_USERNAME=akshat919
 docker-compose -f docker-compose.prod.yml pull
 docker-compose -f docker-compose.prod.yml up -d
 
@@ -135,19 +133,19 @@ curl http://localhost/api/tutorials
 
 | Secret | Value |
 |--------|-------|
-| `DOCKERHUB_USERNAME` | Your Docker Hub username |
-| `DOCKERHUB_TOKEN` | Your access token |
+| `DOCKERHUB_USERNAME` | akshat919 |
+| `DOCKERHUB_TOKEN` | [Your actual Docker Hub token - do not paste in code!] |
 | `VM_HOST` | Your EC2 public IP (from Phase 4B) |
 | `VM_USER` | ubuntu |
-| `VM_SSH_KEY` | [Read entire .pem file content] |
+| `VM_SSH_KEY` | [Read entire Akshat.pem file content] |
 | `VM_PORT` | 22 |
 
 **How to get VM_SSH_KEY:**
 ```bash
 # On your local machine
-cat /path/to/crud-app-key.pem
+cat Akshat.pem
 # Copy entire output (including BEGIN and END lines)
-# Paste into GitHub Secret
+# Paste into GitHub Secret (VM_SSH_KEY)
 ```
 
 ### 5B: Test Pipeline
@@ -171,7 +169,7 @@ Watch it run:
 
 ```bash
 # SSH into EC2 one more time
-ssh -i /path/to/crud-app-key.pem ubuntu@YOUR_EC2_IP
+ssh -i Akshat.pem ubuntu@YOUR_EC2_IP
 
 # Check everything
 cd /opt/crud-app
@@ -217,7 +215,7 @@ Your MEAN stack application is now:
 ```bash
 # Can't SSH into EC2?
 # Check security group allows port 22
-# Make sure key permissions: chmod 600 key.pem
+# Make sure key permissions: chmod 600 Akshat.pem
 
 # Docker not installed?
 sudo systemctl status docker
