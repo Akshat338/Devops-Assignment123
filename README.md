@@ -1,6 +1,230 @@
 # MEAN CRUD App - Dockerized Deployment with CI/CD
 
-This repository contains a MEAN stack CRUD application:
+A complete MEAN stack CRUD application with Docker containerization, GitHub Actions CI/CD pipeline, and cloud deployment on AWS.
+
+## 📋 Architecture Overview
+
+- **Frontend:** Angular 15 (compiled to static files served by Nginx)
+- **Backend:** Node.js + Express (REST API)
+- **Database:** MongoDB 7
+- **Reverse Proxy:** Nginx 1.27
+- **Orchestration:** Docker Compose
+- **CI/CD:** GitHub Actions
+- **Registry:** Docker Hub
+- **Cloud Platform:** AWS EC2
+
+The application is exposed on port 80:
+- `/` → Angular frontend
+- `/api/*` → Node.js/Express backend
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Docker and Docker Compose installed
+- Git installed
+- Docker Hub account
+- GitHub account
+- AWS account (for deployment)
+
+### Local Development
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/<your-username>/crud-dd-task-mean-app.git
+   cd crud-dd-task-mean-app
+   ```
+
+2. **Run locally with Docker Compose:**
+   ```bash
+   docker compose up -d --build
+   ```
+
+3. **Access the application:**
+   - Frontend UI: http://localhost
+   - API: http://localhost/api/tutorials
+
+4. **Stop the application:**
+   ```bash
+   docker compose down
+   ```
+
+## 📦 Project Structure
+
+```
+.
+├── backend/
+│   ├── app/
+│   │   ├── config/          # Database configuration
+│   │   ├── controllers/      # API endpoint handlers
+│   │   ├── models/           # MongoDB models
+│   │   └── routes/           # API routes
+│   ├── Dockerfile            # Backend container image
+│   ├── package.json
+│   └── server.js             # Express server entry point
+├── frontend/
+│   ├── src/
+│   │   ├── app/              # Angular application components
+│   │   ├── assets/           # Static assets
+│   │   ├── index.html
+│   │   └── main.ts           # Angular bootstrap
+│   ├── Dockerfile            # Frontend multi-stage build
+│   ├── package.json
+│   └── angular.json          # Angular CLI configuration
+├── nginx/
+│   └── default.conf          # Nginx reverse proxy configuration
+├── deploy/
+│   └── deploy.sh             # AWS deployment script
+├── .github/
+│   └── workflows/
+│       └── deploy.yml        # GitHub Actions CI/CD pipeline
+├── docker-compose.yml        # Development environment
+├── docker-compose.prod.yml   # Production environment
+└── .gitignore
+```
+
+## 🐳 Docker & Docker Hub Setup
+
+### Build and Push Images to Docker Hub
+
+1. **Create Docker Hub account** at https://hub.docker.com (if you don't have one)
+
+2. **Log in locally:**
+   ```bash
+   docker login
+   ```
+
+3. **Build and push backend image:**
+   ```bash
+   docker build -t <dockerhub-username>/crud-dd-backend:latest ./backend
+   docker push <dockerhub-username>/crud-dd-backend:latest
+   ```
+
+4. **Build and push frontend image:**
+   ```bash
+   docker build -t <dockerhub-username>/crud-dd-frontend:latest ./frontend
+   docker push <dockerhub-username>/crud-dd-frontend:latest
+   ```
+
+## 🔄 GitHub Actions CI/CD Pipeline
+
+### Setup CI/CD Pipeline
+
+1. **Push code to GitHub:**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial MEAN app with Docker, Nginx, and CI/CD"
+   git branch -M main
+   git remote add origin https://github.com/<your-username>/crud-dd-task-mean-app.git
+   git push -u origin main
+   ```
+
+2. **Configure GitHub Secrets in Settings → Secrets and variables → Actions:**
+   - `DOCKERHUB_USERNAME`
+   - `DOCKERHUB_TOKEN`
+   - `VM_HOST`
+   - `VM_USER`
+   - `VM_SSH_KEY`
+   - `VM_PORT`
+
+## ☁️ AWS EC2 Deployment
+
+### Step 1: Launch EC2 Instance
+
+1. Log in to AWS Console → EC2 Dashboard
+2. Click "Launch instances"
+3. Select "Ubuntu 22.04 LTS" or "Amazon Linux 2"
+4. Instance type: t3.small
+5. Security group: Allow ports 22, 80, 443
+6. Create/select EC2 key pair (save the .pem file)
+
+### Step 2: Connect and Setup Docker
+
+```bash
+chmod 600 your-key.pem
+ssh -i your-key.pem ubuntu@<your-ec2-public-ip>
+
+# Install Docker
+sudo apt update && sudo apt install -y docker.io docker-compose git
+
+# Start Docker
+sudo systemctl start docker && sudo systemctl enable docker
+
+# Add user to docker group
+sudo usermod -aG docker ubuntu
+newgrp docker
+```
+
+### Step 3: Deploy Application
+
+```bash
+mkdir -p /opt/crud-app && cd /opt/crud-app
+git clone https://github.com/<your-username>/crud-dd-task-mean-app.git .
+
+export DOCKERHUB_USERNAME=<your-dockerhub-username>
+docker-compose -f docker-compose.prod.yml pull
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+### Step 4: Access Application
+
+Open browser: `http://<your-ec2-public-ip>`
+
+## 🔧 Manual Management
+
+### View Logs
+
+```bash
+docker-compose -f docker-compose.prod.yml logs -f backend
+docker-compose -f docker-compose.prod.yml logs -f frontend
+docker-compose -f docker-compose.prod.yml logs -f mongo
+```
+
+### Update Application
+
+```bash
+cd /opt/crud-app
+git pull origin main
+export DOCKERHUB_USERNAME=<your-dockerhub-username>
+docker-compose -f docker-compose.prod.yml pull
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+## 📊 Architecture Details
+
+### Nginx Reverse Proxy
+
+- `/api/*` → Backend (port 8080)
+- `/` → Frontend (port 80)
+- Single entry point on port 80
+
+### MongoDB
+
+- Official MongoDB 7 Docker image
+- Data persists in `mongo_data` volume
+- Connection: `mongodb://mongo:27017/dd_db`
+
+### Components
+
+| Service | Port | Technology |
+|---------|------|-----------|
+| Frontend | 80 | Angular 15 + Nginx |
+| Backend | 8080 | Node.js + Express |
+| MongoDB | 27017 | MongoDB 7 |
+| Nginx | 80 | Nginx 1.27 |
+
+## 📚 Additional Resources
+
+- [Docker Documentation](https://docs.docker.com/)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [AWS EC2 Documentation](https://docs.aws.amazon.com/ec2/)
+- [MongoDB Documentation](https://docs.mongodb.com/)
+- [Nginx Documentation](https://nginx.org/en/docs/)
+
+## 📝 License
+
+ISC
 - Frontend: Angular 15
 - Backend: Node.js + Express
 - Database: MongoDB

@@ -3,8 +3,17 @@ services:
     image: mongo:7
     container_name: crud-mongo
     restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: dd_db
     volumes:
       - mongo_data:/data/db
+    networks:
+      - mean-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     image: ${DOCKERHUB_USERNAME}/crud-dd-backend:latest
@@ -13,8 +22,17 @@ services:
     environment:
       - MONGODB_URI=mongodb://mongo:27017/dd_db
       - PORT=8080
+      - NODE_ENV=production
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    networks:
+      - mean-network
+    healthcheck:
+      test: curl -f http://localhost:8080/api/tutorials || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     image: ${DOCKERHUB_USERNAME}/crud-dd-frontend:latest
@@ -22,6 +40,13 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    networks:
+      - mean-network
+    healthcheck:
+      test: wget --quiet --tries=1 --spider http://localhost/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   nginx:
     image: nginx:1.27-alpine
@@ -34,6 +59,12 @@ services:
     depends_on:
       - frontend
       - backend
+    networks:
+      - mean-network
 
 volumes:
   mongo_data:
+
+networks:
+  mean-network:
+    driver: bridge
